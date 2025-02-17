@@ -1,0 +1,45 @@
+# fly.toml app configuration file generated for kenzheng99-actual on 2023-09-02T16:22:11-04:00
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
+app = "kenzheng99-actual"
+primary_region = "bos"
+
+[experimental]
+  cmd = ["node", "--max-old-space-size=180", "app.js"]
+  auto_rollback = true
+
+[build]
+  image = "actualbudget/actual-server:latest"
+
+[env]
+  PORT = "5006"
+  TINI_SUBREAPER = "1"
+
+[[mounts]]
+  source = "actual_data"
+  destination = "/data"
+
+[[services]]
+  protocol = "tcp"
+  internal_port = 5006
+  processes = ["app"]
+
+  [[services.ports]]
+    port = 80
+    handlers = ["http"]
+    force_https = true
+
+  [[services.ports]]
+    port = 443
+    handlers = ["tls", "http"]
+  [services.concurrency]
+    type = "connections"
+    hard_limit = 25
+    soft_limit = 20
+
+  [[services.tcp_checks]]
+    interval = "15s"
+    timeout = "2s"
+    grace_period = "10s"
