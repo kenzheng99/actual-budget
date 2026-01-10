@@ -12,5 +12,5 @@
 2. UI update: `ctrl + shift + R` (hard reload)
 
 ## Scripts
-- `python venmo.py ~/Downloads` - parses and combines monthly venmo statements
-- `python bofa.py ~/Downloads` - combines monthly BofA statements
+- `python scripts/venmo.py ~/Downloads` - parses and combines monthly venmo statements
+- `python scripts/bofa.py ~/Downloads` - combines monthly BofA statements
