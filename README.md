@@ -10,3 +10,6 @@
 ## Updating
 1. Server update: `fly deploy`
 2. UI update: `ctrl + shift + R` (hard reload)
+
+## Scripts
+- `python venmo.py ~/Downloads` - parses and combines monthly venmo statements
