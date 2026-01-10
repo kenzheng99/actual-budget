@@ -1,4 +1,5 @@
 # Actual Budget
+Deployment files and utility scripts for my Actual Budget instances.
 
 ## Deploying
 1. `brew install flyctl`
