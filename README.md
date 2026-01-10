@@ -13,3 +13,4 @@
 
 ## Scripts
 - `python venmo.py ~/Downloads` - parses and combines monthly venmo statements
+- `python bofa.py ~/Downloads` - combines monthly BofA statements
