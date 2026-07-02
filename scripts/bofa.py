@@ -1,3 +1,4 @@
+import argparse
 import csv
 import sys
 from datetime import date, datetime
@@ -6,17 +7,26 @@ from pathlib import Path
 ACCOUNT_LAST4 = "0449"
 POSTED_DATE = "Posted Date"
 
-if __name__ == "__main__":
-    if len(sys.argv) < 2:
-        print("Usage: python bofa.py path/to/statements")
-        sys.exit(1)
 
-    dir_path = Path(sys.argv[1])
+def main() -> None:
+    parser = argparse.ArgumentParser(
+        description="Convert BofA statement CSVs for Actual import."
+    )
+    parser.add_argument(
+        "statements_dir",
+        nargs="?",
+        type=Path,
+        default=Path.home() / "Downloads",
+        help=f"Directory containing *_{ACCOUNT_LAST4}.csv files (default: ~/Downloads)",
+    )
+    args = parser.parse_args()
+
+    dir_path = args.statements_dir
     if not dir_path.exists() or not dir_path.is_dir():
         print(f"Error: directory {dir_path} doesn't exist or is not a directory")
         sys.exit(1)
 
-    statement_files = list(dir_path.glob("*_0449.csv"))
+    statement_files = list(dir_path.glob(f"*_{ACCOUNT_LAST4}.csv"))
     if not statement_files:
         print(f"No BofA statements found in {dir_path} for account {ACCOUNT_LAST4}")
         sys.exit(1)
@@ -49,3 +59,7 @@ if __name__ == "__main__":
         writer.writerows(all_rows)
 
     print(f"Wrote {len(all_rows)} rows to {out_filename}")
+
+
+if __name__ == "__main__":
+    main()

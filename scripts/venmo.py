@@ -1,3 +1,4 @@
+import argparse
 import csv
 import sys
 from datetime import date
@@ -8,7 +9,9 @@ OWNER_NAME = "Kenneth Zheng"
 PAYEE_NAME = "Venmo Transaction"
 
 
-def parse_single_stmt(filepath: Path) -> list[dict[str, str]]:
+def parse_single_stmt(
+    filepath: Path, include_all: bool = False
+) -> list[dict[str, str]]:
     # input format:
     # - row 0-1: title (skip)
     # - row 2: headers
@@ -39,8 +42,8 @@ def parse_single_stmt(filepath: Path) -> list[dict[str, str]]:
 
     transactions = []
     for txn in rows:
-        # skip bank transactions
-        if (
+        # skip bank transactions (unless --all)
+        if not include_all and (
             txn.get("Funding Source") != VENMO_BALANCE
             and txn.get("Destination") != VENMO_BALANCE
         ):
@@ -62,12 +65,25 @@ def parse_single_stmt(filepath: Path) -> list[dict[str, str]]:
     return transactions
 
 
-if __name__ == "__main__":
-    if len(sys.argv) < 2:
-        print("Usage: python venmo.py path/to/statements")
-        sys.exit(1)
+def main() -> None:
+    parser = argparse.ArgumentParser(
+        description="Convert Venmo statement CSVs for Actual import."
+    )
+    parser.add_argument(
+        "statements_dir",
+        nargs="?",
+        type=Path,
+        default=Path.home() / "Downloads",
+        help="Directory containing VenmoStatement*.csv files (default: ~/Downloads)",
+    )
+    parser.add_argument(
+        "--all",
+        action="store_true",
+        help="Include all transactions, not just Venmo balance activity",
+    )
+    args = parser.parse_args()
 
-    dir_path = Path(sys.argv[1])
+    dir_path = args.statements_dir
     if not dir_path.exists() or not dir_path.is_dir():
         print(f"Error: directory {dir_path} doesn't exist or is not a directory")
         sys.exit(1)
@@ -79,7 +95,7 @@ if __name__ == "__main__":
 
     all_transactions = []
     for stmt in statement_files:
-        all_transactions.extend(parse_single_stmt(stmt))
+        all_transactions.extend(parse_single_stmt(stmt, include_all=args.all))
 
     if not all_transactions:
         print("No rows to write")
@@ -96,3 +112,7 @@ if __name__ == "__main__":
             writer.writerow(row)
 
     print(f"Wrote {len(all_transactions)} rows to {output_path}")
+
+
+if __name__ == "__main__":
+    main()
